@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sae-vis"
-version = "0.3.7"
+version = "0.3.7+arena.1"
 description = "Open-source SAE visualizer, based on Anthropic's published visualizer."
 authors = ["Callum McDougall <cal.s.mcdougall@gmail.com>"]
 readme = "README.md"
@@ -14,9 +14,11 @@ datasets = ">=2.0.0,<4.0.0"
 dataclasses-json = "^0.6.4"
 jaxtyping = "^0.2.28"
 transformer-lens = ">=2.0.0,<3.0.0"
-eindex-callum = "^0.1.0"
+# ARENA fork of eindex (0.2.0). Same URL string as ARENA_materials/requirements.txt, so pip sees one requirement.
+eindex-callum = { git = "https://github.com/ARENA-education/eindex.git" }
 rich = "^13.7.1"
 matplotlib = "^3.8.4"
+frozendict = "^2.4.0"  # imported by data_config_classes.py
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.7"

@@ -7,6 +7,7 @@ from sae_lens import SAE, HookedSAETransformer, SAEConfig
 from torch import Tensor
 from transformer_lens import HookedTransformer, utils
 
+from sae_vis.sae_cfg import sae_cfg_attr
 from sae_vis.utils_fns import VocabType
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -28,29 +29,29 @@ def to_resid_dir(
     than writing direction (i.e. @ W_in or @ W_V.flatten(-2, -1) respectively).
     """
 
-    match sae.cfg.hook_name.split(".hook_")[-1]:
+    match sae_cfg_attr(sae, "hook_name").split(".hook_")[-1]:
         case "resid_pre" | "resid_mid" | "resid_post" | "attn_out" | "mlp_out":
             return dir
         case "pre" | "post":
             return dir @ (
-                model.W_in[sae.cfg.hook_layer].T
+                model.W_in[sae_cfg_attr(sae, "hook_layer")].T
                 if input
-                else model.W_out[sae.cfg.hook_layer]
+                else model.W_out[sae_cfg_attr(sae, "hook_layer")]
             )
         case "z":
             return dir @ (
                 einops.rearrange(
-                    model.W_V[sae.cfg.hook_layer],
+                    model.W_V[sae_cfg_attr(sae, "hook_layer")],
                     "n_heads d_model d_head -> (n_heads d_head) d_model",
                 )
                 if input
                 else einops.rearrange(
-                    model.W_O[sae.cfg.hook_layer],
+                    model.W_O[sae_cfg_attr(sae, "hook_layer")],
                     "n_heads d_head d_model -> (n_heads d_head) d_model",
                 )
             )
         case _:
-            raise ValueError(f"Unexpected hook name: {sae.cfg.hook_name}")
+            raise ValueError(f"Unexpected hook name: {sae_cfg_attr(sae, 'hook_name')}")
 
 
 def resid_final_pre_layernorm_to_logits(x: Tensor, model: HookedTransformer):
@@ -204,8 +205,8 @@ def load_demo_model_saes_and_data(
         dataset=dataset,  # type: ignore
         tokenizer=model.tokenizer,  # type: ignore
         streaming=True,
-        max_length=sae.cfg.context_size,
-        add_bos_token=sae.cfg.prepend_bos,
+        max_length=sae_cfg_attr(sae, "context_size"),
+        add_bos_token=sae_cfg_attr(sae, "prepend_bos"),
     )
     tokenized_data = tokenized_data.shuffle(42)
     all_tokens = tokenized_data["tokens"]
