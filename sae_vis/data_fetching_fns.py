@@ -375,7 +375,10 @@ def _get_feature_data(
 
     # Create objects to store the data for computing rolling stats
     sae_input_is_privileged = any(
-        [sae_cfg_attr(sae, "hook_name").endswith(x) for x in ["mlp.hook_pre", "mlp.hook_post"]]
+        [
+            sae_cfg_attr(sae, "hook_name").endswith(x)
+            for x in ["mlp.hook_pre", "mlp.hook_post"]
+        ]
     )
     corrcoef_neurons = RollingCorrCoef() if sae_input_is_privileged else None
     corrcoef_sae = RollingCorrCoef(indices=feature_indices, with_self=True)
@@ -657,7 +660,9 @@ def get_sequences_data(
     acts_post_hook_name = f"{sae_cfg_attr(sae, 'hook_name')}.hook_sae_acts_post"
     # sae_acts_pre_hook_name = f"{sae_cfg_attr(sae, 'hook_name')}.hook_sae_acts_pre"
     v_hook_name = utils.get_act_name("v", layer=sae_cfg_attr(sae, "hook_layer"))
-    pattern_hook_name = utils.get_act_name("pattern", layer=sae_cfg_attr(sae, "hook_layer"))
+    pattern_hook_name = utils.get_act_name(
+        "pattern", layer=sae_cfg_attr(sae, "hook_layer")
+    )
 
     resid_post = cache[resid_final_hook_name]
     feat_acts = cache[acts_post_hook_name][..., feat_idx]
@@ -683,7 +688,9 @@ def get_sequences_data(
         k=seq_cfg.top_acts_group_size,
         buffer=buffer_to_exclude_from_ex,
     )
-    use_dfa = seq_cfg.dfa_for_attn_saes and sae_cfg_attr(sae, "hook_name").endswith("hook_z")
+    use_dfa = seq_cfg.dfa_for_attn_saes and sae_cfg_attr(sae, "hook_name").endswith(
+        "hook_z"
+    )
     first_title = (
         "TOP ACTIVATIONS (right) & DFA (left)" if use_dfa else "TOP ACTIVATIONS"
     )

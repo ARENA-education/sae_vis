@@ -24,5 +24,7 @@ def sae_cfg_attr(sae: Any, name: str) -> Any:
             return int(match.group(1))
 
     if not hasattr(metadata, name):
-        raise AttributeError(f"SAE config has no field {name!r} (checked both `sae.cfg` and `sae.cfg.metadata`)")
+        raise AttributeError(
+            f"SAE config has no field {name!r} (checked both `sae.cfg` and `sae.cfg.metadata`)"
+        )
     return value
