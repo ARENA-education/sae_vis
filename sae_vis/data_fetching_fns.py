@@ -1128,7 +1128,9 @@ def get_prompt_data(
     str_toks: list[str] = model.tokenizer.tokenize(prompt)  # type: ignore
     # add_special_tokens=False keeps `tokens` aligned with `str_toks`: in transformers>=5 (TransformerLens 4) the model's
     # tokenizer prepends BOS in `encode` but not in `tokenize`
-    tokens = model.tokenizer.encode(prompt, return_tensors="pt", add_special_tokens=False).to(device)  # type: ignore
+    tokens = model.tokenizer.encode(  # type: ignore
+        prompt, return_tensors="pt", add_special_tokens=False
+    ).to(device)
     assert isinstance(tokens, torch.Tensor)
 
     feature_act_dir = sae.W_enc[:, features]  # [d_in feats]
