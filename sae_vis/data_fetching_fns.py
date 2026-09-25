@@ -17,7 +17,6 @@ from tqdm.auto import tqdm
 from transformer_lens import ActivationCache
 
 from sae_vis._compat import HookedSAETransformer, HookedTransformer, utils
-
 from sae_vis.data_config_classes import (
     SaeVisConfig,
     SaeVisLayoutConfig,
