@@ -8,7 +8,9 @@ from typing import Any, Callable, Literal
 
 import numpy as np
 from jaxtyping import Float, Int
-from sae_lens import SAE, HookedSAETransformer
+from sae_lens import SAE
+
+from sae_vis._compat import HookedSAETransformer
 from torch import Tensor
 from tqdm.auto import tqdm
 

@@ -3,9 +3,10 @@ import torch
 from datasets import load_dataset
 from datasets.arrow_dataset import Dataset
 from jaxtyping import Float
-from sae_lens import SAE, HookedSAETransformer, SAEConfig
+from sae_lens import SAE, SAEConfig
 from torch import Tensor
-from transformer_lens import HookedTransformer, utils
+
+from sae_vis._compat import HookedSAETransformer, HookedTransformer, utils
 
 from sae_vis.sae_cfg import sae_cfg_attr
 from sae_vis.utils_fns import VocabType
