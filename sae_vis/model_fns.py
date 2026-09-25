@@ -7,7 +7,6 @@ from sae_lens import SAE, SAEConfig
 from torch import Tensor
 
 from sae_vis._compat import HookedSAETransformer, HookedTransformer, utils
-
 from sae_vis.sae_cfg import sae_cfg_attr
 from sae_vis.utils_fns import VocabType
 
