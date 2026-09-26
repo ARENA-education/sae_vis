@@ -6,6 +6,10 @@ from sae_lens import SAETransformerBridge, StandardSAE, StandardSAEConfig
 
 from sae_vis.data_config_classes import SaeVisConfig
 from sae_vis.data_storing_fns import SaeVisData
+from sae_vis.utils_fns import get_device
+
+# sae_vis moves tokens to `get_device()` (CUDA when available), so build the model and SAE there too
+DEVICE = str(get_device())
 
 HOOK_NAME = "blocks.0.hook_mlp_out"
 FEATURES = list(range(4))
@@ -16,10 +20,10 @@ def test_feature_centric_vis_with_sae_transformer_bridge(tmp_path: Path):
     `blocks.0.mlp.hook_out.hook_sae_acts_post`), not `{sae.cfg.hook_name}.hook_sae_acts_post`."""
     torch.manual_seed(0)
     model = SAETransformerBridge.boot_transformers(
-        "roneneldan/TinyStories-1M", device="cpu"
+        "roneneldan/TinyStories-1M", device=DEVICE
     )
     model.enable_compatibility_mode()
-    sae_cfg = StandardSAEConfig(d_in=model.cfg.d_model, d_sae=16, device="cpu")
+    sae_cfg = StandardSAEConfig(d_in=model.cfg.d_model, d_sae=16, device=DEVICE)
     sae_cfg.metadata.hook_name = HOOK_NAME
     sae = StandardSAE(sae_cfg)
     torch.nn.init.normal_(sae.W_enc)
@@ -39,7 +43,7 @@ def test_sae_hook_name_falls_back_to_cfg_hook_name():
     """Models without `get_sae_hook_name` (e.g. `HookedSAETransformer`) keep the `{hook_name}.{suffix}` naming."""
     from sae_vis.sae_cfg import sae_hook_name
 
-    sae_cfg = StandardSAEConfig(d_in=8, d_sae=16, device="cpu")
+    sae_cfg = StandardSAEConfig(d_in=8, d_sae=16, device=DEVICE)
     sae_cfg.metadata.hook_name = HOOK_NAME
     sae = StandardSAE(sae_cfg)
     model = SimpleNamespace()
