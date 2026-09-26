@@ -4,6 +4,10 @@ from sae_lens import HookedSAETransformer, StandardSAE, StandardSAEConfig
 from sae_vis.data_config_classes import SaeVisConfig
 from sae_vis.data_fetching_fns import get_prompt_data
 from sae_vis.data_storing_fns import SaeVisData
+from sae_vis.utils_fns import get_device
+
+# sae_vis moves tokens to `get_device()` (CUDA when available), so build the model and SAE there too
+DEVICE = str(get_device())
 
 PROMPT = "Once upon a time, there was a little girl named Lily."
 HOOK_NAME = "blocks.0.hook_mlp_out"
@@ -13,8 +17,8 @@ FEATURES = list(range(4))
 def test_prompt_data_tokens_align_with_str_toks():
     """Each prompt token label must be paired with that token's own activations (no BOS shift)."""
     torch.manual_seed(0)
-    model = HookedSAETransformer.from_pretrained("tiny-stories-1M", device="cpu")
-    sae_cfg = StandardSAEConfig(d_in=model.cfg.d_model, d_sae=16, device="cpu")
+    model = HookedSAETransformer.from_pretrained("tiny-stories-1M", device=DEVICE)
+    sae_cfg = StandardSAEConfig(d_in=model.cfg.d_model, d_sae=16, device=DEVICE)
     sae_cfg.metadata.hook_name = HOOK_NAME
     sae = StandardSAE(sae_cfg)
     torch.nn.init.normal_(sae.W_enc)
@@ -38,7 +42,7 @@ def test_prompt_data_tokens_align_with_str_toks():
         ), "prompt tokens don't match `str_toks` (was BOS prepended?)"
         torch.testing.assert_close(
             torch.tensor(seq_data.feat_acts),
-            expected_acts[:, feature],
+            expected_acts[:, feature].cpu(),
             atol=1e-3,
             rtol=0,
         )
