@@ -22,7 +22,8 @@ from matplotlib import colors
 from tabulate import tabulate
 from torch import Tensor
 from tqdm import tqdm
-from transformer_lens import utils
+
+from sae_vis._compat import utils
 
 VocabType: TypeAlias = Literal["embed", "unembed", "probes"]
 Arr = np.ndarray

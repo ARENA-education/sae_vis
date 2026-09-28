@@ -11,11 +11,12 @@ from eindex import eindex
 from jaxtyping import Float, Int
 from rich import print as rprint
 from rich.table import Table
-from sae_lens import SAE, HookedSAETransformer
+from sae_lens import SAE
 from torch import Tensor
 from tqdm.auto import tqdm
-from transformer_lens import ActivationCache, HookedTransformer, utils
+from transformer_lens import ActivationCache
 
+from sae_vis._compat import HookedSAETransformer, HookedTransformer, utils
 from sae_vis.data_config_classes import (
     SaeVisConfig,
     SaeVisLayoutConfig,
@@ -33,7 +34,7 @@ from sae_vis.data_storing_fns import (
     SequenceData,
 )
 from sae_vis.model_fns import resid_final_pre_layernorm_to_logits, to_resid_dir
-from sae_vis.sae_cfg import sae_cfg_attr
+from sae_vis.sae_cfg import sae_cfg_attr, sae_hook_name
 from sae_vis.utils_fns import (
     METRIC_TITLES,
     FeatureStatistics,
@@ -89,7 +90,7 @@ def parse_feature_data(
 
     # TODO - this function was originally written so that there could be a fn that didn't use the saes and the models. But I don't know if that's really necessary any more, and maybe there's more funcs than we need?
     """
-    acts_post_hook_name = f"{sae_cfg_attr(sae, 'hook_name')}.hook_sae_acts_post"
+    acts_post_hook_name = sae_hook_name(model, sae, "hook_sae_acts_post")
     all_feat_acts = cache[acts_post_hook_name]
 
     time_logs = {
@@ -351,8 +352,8 @@ def _get_feature_data(
     # Create tensors to store the feature activations & final values of the residual stream
     seqpos_slice = slice(*cfg.seqpos_slice)
     resid_final_hook_name = utils.get_act_name("resid_post", model.cfg.n_layers - 1)
-    acts_post_hook_name = f"{sae_cfg_attr(sae, 'hook_name')}.hook_sae_acts_post"
-    sae_input_hook_name = f"{sae_cfg_attr(sae, 'hook_name')}.hook_sae_input"
+    acts_post_hook_name = sae_hook_name(model, sae, "hook_sae_acts_post")
+    sae_input_hook_name = sae_hook_name(model, sae, "hook_sae_input")
     v_hook_name = utils.get_act_name("v", sae_cfg_attr(sae, "hook_layer"))
     pattern_hook_name = utils.get_act_name("pattern", sae_cfg_attr(sae, "hook_layer"))
     cache_dict = {
@@ -657,7 +658,7 @@ def get_sequences_data(
     resid_final_hook_name = utils.get_act_name(
         "resid_post", layer=model.cfg.n_layers - 1
     )
-    acts_post_hook_name = f"{sae_cfg_attr(sae, 'hook_name')}.hook_sae_acts_post"
+    acts_post_hook_name = sae_hook_name(model, sae, "hook_sae_acts_post")
     # sae_acts_pre_hook_name = f"{sae_cfg_attr(sae, 'hook_name')}.hook_sae_acts_pre"
     v_hook_name = utils.get_act_name("v", layer=sae_cfg_attr(sae, "hook_layer"))
     pattern_hook_name = utils.get_act_name(
@@ -1143,7 +1144,7 @@ def get_prompt_data(
     )
 
     resid_final_hook_name = utils.get_act_name("resid_post", model.cfg.n_layers - 1)
-    acts_post_hook_name = f"{sae_cfg_attr(sae, 'hook_name')}.hook_sae_acts_post"
+    acts_post_hook_name = sae_hook_name(model, sae, "hook_sae_acts_post")
     sae.use_error_term = True
     _, cache = model.run_with_cache_with_saes(
         tokens,
