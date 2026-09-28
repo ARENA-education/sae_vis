@@ -1,9 +1,10 @@
 import torch
-from sae_lens import HookedSAETransformer, StandardSAE, StandardSAEConfig
+from sae_lens import StandardSAE, StandardSAEConfig
 
 from sae_vis.data_config_classes import SaeVisConfig
 from sae_vis.data_fetching_fns import get_prompt_data
 from sae_vis.data_storing_fns import SaeVisData
+from sae_vis.sae_cfg import sae_hook_name
 from sae_vis.utils_fns import get_device
 
 # sae_vis moves tokens to `get_device()` (CUDA when available), so build the model and SAE there too
@@ -14,10 +15,24 @@ HOOK_NAME = "blocks.0.hook_mlp_out"
 FEATURES = list(range(4))
 
 
+def load_model():
+    try:
+        from sae_lens import HookedSAETransformer
+    except ImportError:  # transformer-lens 4
+        from sae_lens import SAETransformerBridge
+
+        model = SAETransformerBridge.boot_transformers(
+            "roneneldan/TinyStories-1M", device=DEVICE
+        )
+        model.enable_compatibility_mode()
+        return model
+    return HookedSAETransformer.from_pretrained("tiny-stories-1M", device=DEVICE)
+
+
 def test_prompt_data_tokens_align_with_str_toks():
     """Each prompt token label must be paired with that token's own activations (no BOS shift)."""
     torch.manual_seed(0)
-    model = HookedSAETransformer.from_pretrained("tiny-stories-1M", device=DEVICE)
+    model = load_model()
     sae_cfg = StandardSAEConfig(d_in=model.cfg.d_model, d_sae=16, device=DEVICE)
     sae_cfg.metadata.hook_name = HOOK_NAME
     sae = StandardSAE(sae_cfg)
@@ -33,7 +48,7 @@ def test_prompt_data_tokens_align_with_str_toks():
     expected_ids = model.to_tokens(PROMPT, prepend_bos=False)[0]
     assert len(expected_ids) == len(str_toks)
     _, cache = model.run_with_cache_with_saes(expected_ids, saes=[sae])
-    expected_acts = cache[f"{HOOK_NAME}.hook_sae_acts_post"][0]  # [seq d_sae]
+    expected_acts = cache[sae_hook_name(model, sae)][0]  # [seq d_sae]
 
     for feature in FEATURES:
         seq_data = data.feature_data_dict[feature]["prompt"][0].seq_data[0]
