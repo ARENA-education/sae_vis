@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## ARENA fork
+
+Releases of [ARENA-education/sae_vis](https://github.com/ARENA-education/sae_vis), which continues Callum McDougall's
+[sae_vis](https://github.com/callummcdougall/sae_vis) after its last release (0.3.7). They are published as git tags,
+not on PyPI.
+
+### v0.3.8
+
+* Support transformer-lens 3: the pin is now `transformer-lens>=2,<4`.
+* Relax the `jaxtyping` pin to `>=0.2.28` and the `datasets` pin to `>=2`.
+* Fix the prompt-centric view shifting activations one token relative to their labels when the tokenizer adds BOS
+  (e.g. GPT-2 under transformers 5): `get_prompt_data` now encodes the prompt with `add_special_tokens=False`
+  ([#5](https://github.com/ARENA-education/sae_vis/issues/5)).
+
+### v0.3.7+arena.1
+
+* Support sae-lens >= 6, which moved `hook_name`, `hook_layer`, `context_size`, `dataset_path` and `prepend_bos` from
+  `sae.cfg` onto `sae.cfg.metadata`.
+* Depend on the [ARENA eindex fork](https://github.com/ARENA-education/eindex) (0.2.0), removing the
+  `eindex-callum<0.2` pin.
+* Declare the `frozendict` dependency.
+* Remove the PyPI release job.
+
+## Upstream (callummcdougall/sae_vis)
+
+The entries below were generated upstream and stop at v0.2.19; 0.3.0 to 0.3.7 have no entries.
+
 
 
 ## v0.2.19 (2024-06-12)

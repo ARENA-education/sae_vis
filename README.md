@@ -1,3 +1,5 @@
+**ARENA fork.** This is [ARENA](https://github.com/ARENA-education)'s maintained fork of Callum McDougall's sae_vis. It supports sae-lens 6 and transformer-lens 2 and 3; see [CHANGELOG.md](CHANGELOG.md). Install a release by tag, e.g. `pip install "sae-vis @ git+https://github.com/ARENA-education/sae_vis.git@v0.3.8"` (`pip install sae-vis` installs the original 0.3.7 from PyPI).
+
 Note - I'm still open to accepting PRs on this library, and am very happy for other people to build on it, but I won't be actively maintaining it going forwards since I'll be focusing on my job. The [SAELens](https://github.com/jbloomAus/SAELens) library will continue to have more development and iteration, and it uses a fork of this repo as well as containing a much larger suite of tools for working with SAEs, so depending on your use case you might find that library preferable!
 
 ---
